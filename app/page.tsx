@@ -3,6 +3,9 @@ import Image from "next/image";
 export default function Home() {
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+      <div className="w-full bg-emerald-600 py-3 text-center text-white font-bold text-lg tracking-wide">
+        그로브 홈페이지 리뉴얼 — 자동 배포 테스트 중
+      </div>
       <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
         <Image
           className="dark:invert"
