@@ -15,13 +15,19 @@ button:focus-visible,.project-card:focus-visible{outline:2px solid #111;outline-
 
 .shell{position:relative;width:100vw;height:100vh;min-height:640px;background:var(--bg);overflow:hidden}
 
+/* Left 50%: 3D scene area */
+.scene-zone{
+  position:absolute;
+  inset:0 50% 0 0;
+  z-index:1;
+}
+
 .identity{
   position:absolute;
-  left:17.75vw;
-  top:50%;
-  transform:translateY(-50%);
+  left:5vw;
+  bottom:8vh;
   z-index:10;
-  width:min(34vw,650px);
+  width:min(40vw,560px);
 }
 .identity h1{margin:0;font-size:clamp(34px,2.22vw,44px);line-height:.98;font-weight:600;letter-spacing:-.055em}
 .identity h1 span{display:block;color:var(--muted);font-weight:500;margin-top:5px}
@@ -35,7 +41,7 @@ button:focus-visible,.project-card:focus-visible{outline:2px solid #111;outline-
 
 .carousel-zone{
   position:absolute;
-  inset:0 0 0 51.3%;
+  inset:0 0 0 50%;
   perspective:1150px;
   perspective-origin:46% 50%;
   z-index:5;
