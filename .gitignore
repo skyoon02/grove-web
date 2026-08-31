@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel
+.env*
+
+# 로컬 백업 및 임시 파일
+backup_*/
+offline-package/
+offline-package-check.png
+works-admin.html
