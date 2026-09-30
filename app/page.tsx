@@ -1,167 +1,101 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { Canvas } from '@react-three/fiber'
-
-type MenuKey = 'about' | 'works' | 'service' | 'team' | 'contact'
-
-const PROJECTS = [
-  { key: 'about' as MenuKey, title: 'ABOUT', tone: '#e8edf2', titleColor: '#1a2535', desc: 'How GROVE thinks and why we do what we do.', lead: 'We start with the question before we build the answer.' },
-  { key: 'works' as MenuKey, title: 'WORKS', tone: '#ffe2ae', titleColor: '#10214b', desc: 'Selected digital products and brand experiences.', lead: 'We turn the essential idea into a clear, useful and memorable digital experience.' },
-  { key: 'service' as MenuKey, title: 'SERVICE', tone: '#d7def3', titleColor: '#172848', desc: 'Strategy, design, development and AI — connected.', lead: 'From planning to launch, we connect the pieces that move your business forward.' },
-  { key: 'team' as MenuKey, title: 'TEAM', tone: '#d7e5d6', titleColor: '#163a2f', desc: 'The people behind the work.', lead: 'Good work comes from good people asking the right questions together.' },
-  { key: 'contact' as MenuKey, title: 'CONTACT', tone: '#e7d9cf', titleColor: '#33251f', desc: 'Start with the problem, not the solution.', lead: 'Tell us what needs to change. We will start by finding the question at the core.' },
-]
-
-function mockMarkup() {
-  return `<div class="browser-mock"><div class="browser-bar"><i class="browser-dot"></i><i class="browser-dot"></i><i class="browser-dot"></i><b class="browser-name">GROVE</b><div class="browser-nav"><span>WORK</span><span>CORE</span><span>CONTACT</span></div></div><div class="mock-layout"><div class="mock-left"><div class="mock-tile"></div><div class="mock-tile"></div><div class="mock-tile"></div><div class="mock-tile"></div></div><div class="mock-right"><div class="mock-eyebrow">Digital Experience</div><div class="mock-headline">Designing what matters.</div><div class="mock-rule"></div><div class="mock-rule"></div><div class="mock-rule short"></div></div></div></div>`
-}
-
-function TestBox() {
-  return (
-    <mesh rotation={[0.3, 0.5, 0]}>
-      <boxGeometry args={[2, 2, 2]} />
-      <meshStandardMaterial color="#c8c4bc" roughness={0.4} metalness={0.1} />
-    </mesh>
-  )
-}
-
-function KeycapScene({ activeMenu }: { activeMenu: MenuKey }) {
-  void activeMenu
-  return (
-    <Canvas dpr={[1, 1.5]} camera={{ position: [0, 4.2, 8.5], fov: 36 }}>
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[-4, 7, 6]} intensity={2.2} />
-      <directionalLight position={[5, 2, 3]} intensity={0.35} />
-      <TestBox />
-    </Canvas>
-  )
-}
+import { useEffect } from 'react'
 
 export default function Home() {
-  const [activeIdx, setActiveIdxState] = useState(0)
-  const [detailOpen, setDetailOpenState] = useState(false)
-  const [detailProject, setDetailProject] = useState(PROJECTS[0])
-  const [leaving, setLeaving] = useState(false)
-
-  const activeIdxRef = useRef(0)
-  const detailOpenRef = useRef(false)
-  const busyRef = useRef(false)
-  const wheelAccumRef = useRef(0)
-  const wheelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const dragStartRef = useRef<number | null>(null)
-  const pressedIdxRef = useRef<number | null>(null)
-  const zoneRef = useRef<HTMLElement>(null)
-  const stageRef = useRef<HTMLDivElement>(null)
-
-  function syncActiveIdx(next: number) {
-    activeIdxRef.current = next
-    setActiveIdxState(next)
-  }
-
-  function syncDetailOpen(v: boolean) {
-    detailOpenRef.current = v
-    setDetailOpenState(v)
-  }
-
-  function getPos(i: number) {
-    let d = i - activeIdx
-    const n = PROJECTS.length
-    if (d > n / 2) d -= n
-    if (d < -n / 2) d += n
-    if (d > 1) return 2
-    if (d < -1) return -2
-    return d
-  }
-
-  function openDetail(idx: number) {
-    if (busyRef.current) return
-    busyRef.current = true
-    const p = PROJECTS[idx]
-    const card = stageRef.current?.querySelector(`[data-index="${idx}"]`) as HTMLElement | null
-    if (!card) { busyRef.current = false; return }
-    const rect = card.getBoundingClientRect()
-    const clone = document.createElement('div')
-    clone.className = 'expand-clone'
-    clone.style.cssText = `left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;border-radius:40px;background:${p.tone}`
-    clone.innerHTML = `<div style="position:absolute;inset:0;--tone:${p.tone};--titleColor:${p.titleColor}">${mockMarkup()}</div>`
-    document.body.appendChild(clone)
-    setDetailProject(p)
-    setLeaving(true)
-    clone.getBoundingClientRect()
-    requestAnimationFrame(() => {
-      clone.style.transition = 'left 920ms var(--ease),top 920ms var(--ease),width 920ms var(--ease),height 920ms var(--ease),border-radius 920ms var(--ease)'
-      clone.style.left = '0'; clone.style.top = '0'; clone.style.width = '100vw'; clone.style.height = '100vh'; clone.style.borderRadius = '0'
-    })
-    setTimeout(() => { syncDetailOpen(true); clone.remove(); busyRef.current = false }, 800)
-  }
-
-  function closeDetail() {
-    if (busyRef.current) return
-    busyRef.current = true
-    const p = PROJECTS[activeIdxRef.current]
-    const card = stageRef.current?.querySelector(`[data-index="${activeIdxRef.current}"]`) as HTMLElement | null
-    if (!card) { syncDetailOpen(false); setLeaving(false); busyRef.current = false; return }
-    const rect = card.getBoundingClientRect()
-    const clone = document.createElement('div')
-    clone.className = 'expand-clone'
-    clone.style.cssText = `left:0;top:0;width:100vw;height:100vh;border-radius:0;background:${p.tone}`
-    clone.innerHTML = `<div style="position:absolute;inset:0;--tone:${p.tone};--titleColor:${p.titleColor}">${mockMarkup()}</div>`
-    document.body.appendChild(clone)
-    syncDetailOpen(false)
-    setLeaving(false)
-    clone.getBoundingClientRect()
-    requestAnimationFrame(() => {
-      clone.style.transition = 'left 900ms var(--ease),top 900ms var(--ease),width 900ms var(--ease),height 900ms var(--ease),border-radius 900ms var(--ease)'
-      clone.style.left = `${rect.left}px`; clone.style.top = `${rect.top}px`
-      clone.style.width = `${rect.width}px`; clone.style.height = `${rect.height}px`
-      clone.style.borderRadius = '40px'
-    })
-    setTimeout(() => { clone.remove(); busyRef.current = false }, 950)
-  }
-
   useEffect(() => {
-    const zone = zoneRef.current!
-    const stage = stageRef.current!
-    if (!zone || !stage) return
+    const projects = [
+      { title: 'WORKS', tone: '#ffe2ae', titleColor: '#10214b', desc: 'Selected digital products and brand experiences.', lead: 'We turn the essential idea into a clear, useful and memorable digital experience.' },
+      { title: 'CORE', tone: '#d7e5d6', titleColor: '#163a2f', desc: 'How GROVE thinks, asks and builds.', lead: 'Good outcomes begin with good questions. We focus first on what the project actually needs.' },
+      { title: 'AI', tone: '#d7def3', titleColor: '#172848', desc: 'AI-powered systems and new digital interfaces.', lead: 'We connect useful technology with interfaces people can understand and actually use.' },
+      { title: 'CONTACT', tone: '#e7d9cf', titleColor: '#33251f', desc: 'Start with the problem, not the solution.', lead: 'Tell us what needs to change. We will start by finding the question at the core.' },
+    ]
 
-    function doSetActive(i: number) {
-      if (busyRef.current) return
-      busyRef.current = true
-      const next = (i + PROJECTS.length) % PROJECTS.length
-      activeIdxRef.current = next
-      setActiveIdxState(next)
-      setTimeout(() => { busyRef.current = false }, 930)
+    const shell = document.getElementById('shell')!
+    const zone = document.getElementById('carouselZone')!
+    const stage = document.getElementById('stage')!
+    const dotsEl = document.getElementById('dots')!
+    const detail = document.getElementById('detail')!
+    const backBtn = document.getElementById('backBtn')!
+
+    let active = 0, busy = false, wheelAccum = 0, wheelTimer: ReturnType<typeof setTimeout> | null = null
+    let dragStart: number | null = null, dragY = 0
+    let pressedCard: HTMLElement | null = null
+
+    function mockMarkup() {
+      return `
+        <div class="browser-mock">
+          <div class="browser-bar"><i class="browser-dot"></i><i class="browser-dot"></i><i class="browser-dot"></i><b class="browser-name">GROVE</b><div class="browser-nav"><span>WORK</span><span>CORE</span><span>CONTACT</span></div></div>
+          <div class="mock-layout">
+            <div class="mock-left"><div class="mock-tile"></div><div class="mock-tile"></div><div class="mock-tile"></div><div class="mock-tile"></div></div>
+            <div class="mock-right"><div class="mock-eyebrow">Digital Experience</div><div class="mock-headline">Designing what matters.</div><div class="mock-rule"></div><div class="mock-rule"></div><div class="mock-rule short"></div></div>
+          </div>
+        </div>`
     }
 
-    function advance(dir: number) {
-      doSetActive(activeIdxRef.current + (dir > 0 ? 1 : -1))
+    projects.forEach((p, i) => {
+      const card = document.createElement('button')
+      card.className = 'project-card'
+      card.type = 'button'
+      card.dataset.index = String(i)
+      card.setAttribute('aria-label', `Open ${p.title}`)
+      card.innerHTML = `<div class="card-inner" style="--tone:${p.tone};--titleColor:${p.titleColor}">${mockMarkup()}<div class="card-title">${p.title}</div><div class="card-index">${String(i + 1).padStart(2, '0')}</div></div>`
+      card.addEventListener('click', () => { if (i === active && !busy) openDetail(card, p) })
+      stage.appendChild(card)
+
+      const dot = document.createElement('button')
+      dot.className = 'dot'
+      dot.type = 'button'
+      dot.setAttribute('aria-label', `Go to ${p.title}`)
+      dot.addEventListener('click', () => setActive(i))
+      dotsEl.appendChild(dot)
+    })
+
+    function relativePos(i: number) {
+      let d = i - active
+      const n = projects.length
+      if (d > n / 2) d -= n
+      if (d < -n / 2) d += n
+      if (d > 1) return 2
+      if (d < -1) return -2
+      return d
     }
+
+    function render() {
+      Array.from(stage.children).forEach((card, i) => (card as HTMLElement).dataset.pos = String(relativePos(i)))
+      Array.from(dotsEl.children).forEach((dot, i) => dot.classList.toggle('active', i === active))
+    }
+
+    function setActive(i: number) {
+      if (busy || i === active) return
+      busy = true
+      active = (i + projects.length) % projects.length
+      render()
+      setTimeout(() => busy = false, 930)
+    }
+
+    function advance(dir: number) { setActive(active + (dir > 0 ? 1 : -1)) }
 
     function onWheel(e: WheelEvent) {
       e.preventDefault()
-      if (busyRef.current) return
-      wheelAccumRef.current += e.deltaY
-      if (wheelTimerRef.current) clearTimeout(wheelTimerRef.current)
-      wheelTimerRef.current = setTimeout(() => { wheelAccumRef.current = 0 }, 130)
-      if (Math.abs(wheelAccumRef.current) > 32) {
-        const d = wheelAccumRef.current > 0 ? 1 : -1
-        wheelAccumRef.current = 0
-        advance(d)
-      }
+      if (busy) return
+      wheelAccum += e.deltaY
+      if (wheelTimer) clearTimeout(wheelTimer)
+      wheelTimer = setTimeout(() => wheelAccum = 0, 130)
+      if (Math.abs(wheelAccum) > 32) { const d = wheelAccum > 0 ? 1 : -1; wheelAccum = 0; advance(d) }
     }
 
     function onPointerDown(e: PointerEvent) {
-      if (busyRef.current) return
-      dragStartRef.current = e.clientY
-      const card = (e.target as HTMLElement).closest('.project-card[data-pos="0"]') as HTMLElement | null
-      pressedIdxRef.current = card ? Number(card.dataset.index) : null
+      if (busy) return
+      dragStart = e.clientY
+      dragY = 0
+      pressedCard = (e.target as HTMLElement).closest('.project-card[data-pos="0"]') as HTMLElement | null
       zone.classList.add('dragging')
     }
 
     function onPointerMove(e: PointerEvent) {
-      if (dragStartRef.current === null || busyRef.current) return
-      const dragY = e.clientY - dragStartRef.current
+      if (dragStart === null || busy) return
+      dragY = e.clientY - dragStart
       if (Math.abs(dragY) > 4 && !(zone as any).hasPointerCapture?.(e.pointerId)) {
         (zone as any).setPointerCapture?.(e.pointerId)
       }
@@ -173,19 +107,20 @@ export default function Home() {
     }
 
     function onPointerUp(e: PointerEvent) {
-      if (dragStartRef.current === null) return
-      const signedDrag = e.clientY - dragStartRef.current
+      if (dragStart === null) return
+      const signedDrag = e.clientY - dragStart
       const distance = Math.abs(signedDrag)
-      const tappedIdx = pressedIdxRef.current
+      const tappedCard = pressedCard
+      const tappedIndex = tappedCard ? Number(tappedCard.dataset.index) : -1
       const center = stage.querySelector('[data-pos="0"]') as HTMLElement | null
       if (center) { center.style.transition = ''; center.style.transform = '' }
       zone.classList.remove('dragging')
-      dragStartRef.current = null; pressedIdxRef.current = null
+      dragStart = null; dragY = 0; pressedCard = null
 
       if (distance > 58) {
         advance(signedDrag < 0 ? 1 : -1)
-      } else if (distance <= 10 && tappedIdx !== null && tappedIdx === activeIdxRef.current) {
-        openDetail(tappedIdx)
+      } else if (distance <= 10 && tappedCard && tappedIndex === active) {
+        openDetail(tappedCard, projects[tappedIndex])
       }
     }
 
@@ -193,13 +128,58 @@ export default function Home() {
       const center = stage.querySelector('[data-pos="0"]') as HTMLElement | null
       if (center) { center.style.transition = ''; center.style.transform = '' }
       zone.classList.remove('dragging')
-      dragStartRef.current = null; pressedIdxRef.current = null
+      dragStart = null; dragY = 0; pressedCard = null
     }
 
     function onKeyDown(e: KeyboardEvent) {
-      if (detailOpenRef.current) { if (e.key === 'Escape') closeDetail(); return }
+      if (detail.classList.contains('active')) { if (e.key === 'Escape') closeDetail(); return }
       if (e.key === 'ArrowDown' || e.key === 'ArrowRight') advance(1)
       if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') advance(-1)
+      if (e.key === 'Enter') { const c = stage.querySelector('[data-pos="0"]') as HTMLElement | null; if (c) c.click() }
+    }
+
+    function openDetail(card: HTMLElement, p: typeof projects[0]) {
+      if (busy) return; busy = true
+      const rect = card.getBoundingClientRect()
+      const clone = document.createElement('div')
+      clone.className = 'expand-clone'
+      clone.style.cssText = `left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;border-radius:40px;background:${p.tone}`
+      clone.innerHTML = `<div style="position:absolute;inset:0;--tone:${p.tone};--titleColor:${p.titleColor}">${mockMarkup()}</div>`
+      document.body.appendChild(clone)
+      const detailHero = document.getElementById('detailHero')!
+      detailHero.style.setProperty('--detailTone', p.tone)
+      detail.style.setProperty('--detailTone', p.tone)
+      document.getElementById('detailTitle')!.textContent = p.title
+      document.getElementById('detailDesc')!.textContent = p.desc
+      document.getElementById('detailLead')!.textContent = p.lead
+      document.getElementById('detailBrowser')!.innerHTML = mockMarkup()
+      shell.classList.add('leaving')
+      clone.getBoundingClientRect()
+      requestAnimationFrame(() => {
+        clone.style.transition = 'left 920ms var(--ease),top 920ms var(--ease),width 920ms var(--ease),height 920ms var(--ease),border-radius 920ms var(--ease)'
+        clone.style.left = '0'; clone.style.top = '0'; clone.style.width = '100vw'; clone.style.height = '100vh'; clone.style.borderRadius = '0'
+      })
+      setTimeout(() => { detail.classList.add('active'); detail.setAttribute('aria-hidden', 'false'); detail.scrollTop = 0 }, 800)
+      setTimeout(() => { clone.remove(); busy = false }, 980)
+    }
+
+    function closeDetail() {
+      if (busy) return; busy = true
+      const card = stage.querySelector('[data-pos="0"]') as HTMLElement
+      const p = projects[active]
+      const rect = card.getBoundingClientRect()
+      const clone = document.createElement('div')
+      clone.className = 'expand-clone'
+      clone.style.cssText = `left:0;top:0;width:100vw;height:100vh;border-radius:0;background:${p.tone}`
+      clone.innerHTML = `<div style="position:absolute;inset:0;--tone:${p.tone};--titleColor:${p.titleColor}">${mockMarkup()}</div>`
+      document.body.appendChild(clone)
+      detail.classList.remove('active'); detail.setAttribute('aria-hidden', 'true'); shell.classList.remove('leaving')
+      clone.getBoundingClientRect()
+      requestAnimationFrame(() => {
+        clone.style.transition = 'left 900ms var(--ease),top 900ms var(--ease),width 900ms var(--ease),height 900ms var(--ease),border-radius 900ms var(--ease)'
+        clone.style.left = `${rect.left}px`; clone.style.top = `${rect.top}px`; clone.style.width = `${rect.width}px`; clone.style.height = `${rect.height}px`; clone.style.borderRadius = '40px'
+      })
+      setTimeout(() => { clone.remove(); busy = false }, 950)
     }
 
     zone.addEventListener('wheel', onWheel as EventListener, { passive: false })
@@ -208,6 +188,9 @@ export default function Home() {
     zone.addEventListener('pointerup', onPointerUp as EventListener)
     zone.addEventListener('pointercancel', onPointerCancel)
     document.addEventListener('keydown', onKeyDown)
+    backBtn.addEventListener('click', closeDetail)
+
+    render()
 
     return () => {
       zone.removeEventListener('wheel', onWheel as EventListener)
@@ -216,21 +199,15 @@ export default function Home() {
       zone.removeEventListener('pointerup', onPointerUp as EventListener)
       zone.removeEventListener('pointercancel', onPointerCancel)
       document.removeEventListener('keydown', onKeyDown)
+      backBtn.removeEventListener('click', closeDetail)
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const activeMenu = PROJECTS[activeIdx].key
+  }, [])
 
   return (
     <>
-      <main className={`shell${leaving ? ' leaving' : ''}`}>
-
-        <div className="scene-zone">
-          <KeycapScene activeMenu={activeMenu} />
-        </div>
-
+      <main className="shell" id="shell">
         <section className="identity" aria-label="Brand">
-          <h1>GROVE<span>AI, engineered for AX.</span></h1>
+          <h1>GROVE<span>Digital Experience</span></h1>
           <div className="utility">
             <button className="icon-btn" aria-label="About Grove" title="About Grove">
               <svg viewBox="0 0 24 24">
@@ -249,70 +226,24 @@ export default function Home() {
           </div>
         </section>
 
-        <section
-          className="carousel-zone"
-          ref={zoneRef as React.RefObject<HTMLElement>}
-          aria-label="Project menu carousel"
-        >
-          <div className="carousel-stage" ref={stageRef}>
-            {PROJECTS.map((p, i) => (
-              <button
-                key={p.key}
-                className="project-card"
-                data-pos={String(getPos(i))}
-                data-index={String(i)}
-                type="button"
-                aria-label={`Open ${p.title}`}
-                onClick={() => { if (i === activeIdx && !busyRef.current) openDetail(i) }}
-              >
-                <div
-                  className="card-inner"
-                  style={{ '--tone': p.tone, '--titleColor': p.titleColor } as React.CSSProperties}
-                >
-                  <div dangerouslySetInnerHTML={{ __html: mockMarkup() }} />
-                  <div className="card-title">{p.title}</div>
-                  <div className="card-index">{String(i + 1).padStart(2, '0')}</div>
-                </div>
-              </button>
-            ))}
-          </div>
+        <section className="carousel-zone" id="carouselZone" aria-label="Project menu carousel">
+          <div className="carousel-stage" id="stage"></div>
         </section>
-
-        <nav className="dots" aria-label="Project pagination">
-          {PROJECTS.map((p, i) => (
-            <button
-              key={p.key}
-              className={`dot${i === activeIdx ? ' active' : ''}`}
-              type="button"
-              aria-label={`Go to ${p.title}`}
-              onClick={() => {
-                if (busyRef.current || i === activeIdxRef.current) return
-                busyRef.current = true
-                activeIdxRef.current = i
-                setActiveIdxState(i)
-                setTimeout(() => { busyRef.current = false }, 930)
-              }}
-            />
-          ))}
-        </nav>
+        <nav className="dots" id="dots" aria-label="Project pagination"></nav>
         <div className="hint">Scroll / drag</div>
       </main>
 
-      <section
-        className={`detail${detailOpen ? ' active' : ''}`}
-        aria-hidden={detailOpen ? 'false' : 'true'}
-        style={{ '--detailTone': detailProject.tone } as React.CSSProperties}
-      >
-        <button className="back" type="button" onClick={closeDetail}>Back</button>
-        <div className="detail-hero">
-          <div className="detail-browser" dangerouslySetInnerHTML={{ __html: mockMarkup() }} />
+      <section className="detail" id="detail" aria-hidden="true">
+        <button className="back" id="backBtn">Back</button>
+        <div className="detail-hero" id="detailHero">
+          <div className="detail-browser" id="detailBrowser"></div>
           <div className="detail-copy">
-            <h2>{detailProject.title}</h2>
-            <p>{detailProject.desc}</p>
+            <h2 id="detailTitle">WORKS</h2>
+            <p id="detailDesc">Selected digital products and brand experiences.</p>
           </div>
         </div>
         <div className="detail-body">
-          <p className="lead">{detailProject.lead}</p>
+          <p className="lead" id="detailLead">We build digital experiences around the essential idea.</p>
         </div>
       </section>
     </>
