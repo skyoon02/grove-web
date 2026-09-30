@@ -1,320 +1,199 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { Canvas } from '@react-three/fiber'
+import dynamic from 'next/dynamic'
+import Link from 'next/link'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
+import SiteHeader from './SiteHeader'
 
-type MenuKey = 'about' | 'works' | 'service' | 'team' | 'contact'
+const LandingKeycapScene = dynamic(() => import('./LandingKeycapScene'), {
+  ssr: false,
+  loading: () => <div className="landing-scene-placeholder" aria-hidden="true" />,
+})
 
-const PROJECTS = [
-  { key: 'about' as MenuKey, title: 'ABOUT', tone: '#e8edf2', titleColor: '#1a2535', desc: 'How GROVE thinks and why we do what we do.', lead: 'We start with the question before we build the answer.' },
-  { key: 'works' as MenuKey, title: 'WORKS', tone: '#ffe2ae', titleColor: '#10214b', desc: 'Selected digital products and brand experiences.', lead: 'We turn the essential idea into a clear, useful and memorable digital experience.' },
-  { key: 'service' as MenuKey, title: 'SERVICE', tone: '#d7def3', titleColor: '#172848', desc: 'Strategy, design, development and AI — connected.', lead: 'From planning to launch, we connect the pieces that move your business forward.' },
-  { key: 'team' as MenuKey, title: 'TEAM', tone: '#d7e5d6', titleColor: '#163a2f', desc: 'The people behind the work.', lead: 'Good work comes from good people asking the right questions together.' },
-  { key: 'contact' as MenuKey, title: 'CONTACT', tone: '#e7d9cf', titleColor: '#33251f', desc: 'Start with the problem, not the solution.', lead: 'Tell us what needs to change. We will start by finding the question at the core.' },
-]
+const workflowSteps = [
+  ['proposal', '선제안', '83%'],
+  ['prototype', '프로토타입', '75%'],
+  ['requirements', '기능 정의', '65%'],
+  ['wireframe', '화면 설계', '56%'],
+  ['development', '시스템 구축', '45%'],
+  ['testing', '품질 검증', '33%'],
+  ['stabilize', '런칭 및 안정화', '18%'],
+] as const
 
-function mockMarkup() {
-  return `<div class="browser-mock"><div class="browser-bar"><i class="browser-dot"></i><i class="browser-dot"></i><i class="browser-dot"></i><b class="browser-name">GROVE</b><div class="browser-nav"><span>WORK</span><span>CORE</span><span>CONTACT</span></div></div><div class="mock-layout"><div class="mock-left"><div class="mock-tile"></div><div class="mock-tile"></div><div class="mock-tile"></div><div class="mock-tile"></div></div><div class="mock-right"><div class="mock-eyebrow">Digital Experience</div><div class="mock-headline">Designing what matters.</div><div class="mock-rule"></div><div class="mock-rule"></div><div class="mock-rule short"></div></div></div></div>`
+function handleInquirySubmit(event: FormEvent<HTMLFormElement>) {
+  event.preventDefault()
+  const data = new FormData(event.currentTarget)
+  const name = String(data.get('name') ?? '').trim()
+  const contact = String(data.get('contact') ?? '').trim()
+  const project = String(data.get('project') ?? '').trim()
+  const subject = encodeURIComponent(`[프로젝트 문의] ${name || '새로운 프로젝트'}`)
+  const body = encodeURIComponent(`이름: ${name}\
+연락처: ${contact}\
+\
+프로젝트 내용:\
+${project}`)
+  window.location.href = `mailto:request@grovesoft.net?subject=${subject}&body=${body}`
 }
 
-function TestBox() {
-  return (
-    <mesh rotation={[0.3, 0.5, 0]}>
-      <boxGeometry args={[2, 2, 2]} />
-      <meshStandardMaterial color="#c8c4bc" roughness={0.4} metalness={0.1} />
-    </mesh>
-  )
-}
-
-function KeycapScene({ activeMenu }: { activeMenu: MenuKey }) {
-  void activeMenu
-  return (
-    <Canvas dpr={[1, 1.5]} camera={{ position: [0, 4.2, 8.5], fov: 36 }}>
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[-4, 7, 6]} intensity={2.2} />
-      <directionalLight position={[5, 2, 3]} intensity={0.35} />
-      <TestBox />
-    </Canvas>
-  )
-}
+const clientLogos = [
+  { name: 'KRAFTON', className: 'krafton' },
+  { name: 'AMOREPACIFIC', className: 'amorepacific' },
+  { name: 'kt', className: 'kt' },
+  { name: 'Titleist', className: 'titleist' },
+  { name: 'HYBE', className: 'hybe' },
+  { name: 'LG', className: 'lg' },
+] as const
 
 export default function Home() {
-  const [activeIdx, setActiveIdxState] = useState(0)
-  const [detailOpen, setDetailOpenState] = useState(false)
-  const [detailProject, setDetailProject] = useState(PROJECTS[0])
-  const [leaving, setLeaving] = useState(false)
-
-  const activeIdxRef = useRef(0)
-  const detailOpenRef = useRef(false)
-  const busyRef = useRef(false)
-  const wheelAccumRef = useRef(0)
-  const wheelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const dragStartRef = useRef<number | null>(null)
-  const pressedIdxRef = useRef<number | null>(null)
-  const zoneRef = useRef<HTMLElement>(null)
-  const stageRef = useRef<HTMLDivElement>(null)
-
-  function syncActiveIdx(next: number) {
-    activeIdxRef.current = next
-    setActiveIdxState(next)
-  }
-
-  function syncDetailOpen(v: boolean) {
-    detailOpenRef.current = v
-    setDetailOpenState(v)
-  }
-
-  function getPos(i: number) {
-    let d = i - activeIdx
-    const n = PROJECTS.length
-    if (d > n / 2) d -= n
-    if (d < -n / 2) d += n
-    if (d > 1) return 2
-    if (d < -1) return -2
-    return d
-  }
-
-  function openDetail(idx: number) {
-    if (busyRef.current) return
-    busyRef.current = true
-    const p = PROJECTS[idx]
-    const card = stageRef.current?.querySelector(`[data-index="${idx}"]`) as HTMLElement | null
-    if (!card) { busyRef.current = false; return }
-    const rect = card.getBoundingClientRect()
-    const clone = document.createElement('div')
-    clone.className = 'expand-clone'
-    clone.style.cssText = `left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;border-radius:40px;background:${p.tone}`
-    clone.innerHTML = `<div style="position:absolute;inset:0;--tone:${p.tone};--titleColor:${p.titleColor}">${mockMarkup()}</div>`
-    document.body.appendChild(clone)
-    setDetailProject(p)
-    setLeaving(true)
-    clone.getBoundingClientRect()
-    requestAnimationFrame(() => {
-      clone.style.transition = 'left 920ms var(--ease),top 920ms var(--ease),width 920ms var(--ease),height 920ms var(--ease),border-radius 920ms var(--ease)'
-      clone.style.left = '0'; clone.style.top = '0'; clone.style.width = '100vw'; clone.style.height = '100vh'; clone.style.borderRadius = '0'
-    })
-    setTimeout(() => { syncDetailOpen(true); clone.remove(); busyRef.current = false }, 800)
-  }
-
-  function closeDetail() {
-    if (busyRef.current) return
-    busyRef.current = true
-    const p = PROJECTS[activeIdxRef.current]
-    const card = stageRef.current?.querySelector(`[data-index="${activeIdxRef.current}"]`) as HTMLElement | null
-    if (!card) { syncDetailOpen(false); setLeaving(false); busyRef.current = false; return }
-    const rect = card.getBoundingClientRect()
-    const clone = document.createElement('div')
-    clone.className = 'expand-clone'
-    clone.style.cssText = `left:0;top:0;width:100vw;height:100vh;border-radius:0;background:${p.tone}`
-    clone.innerHTML = `<div style="position:absolute;inset:0;--tone:${p.tone};--titleColor:${p.titleColor}">${mockMarkup()}</div>`
-    document.body.appendChild(clone)
-    syncDetailOpen(false)
-    setLeaving(false)
-    clone.getBoundingClientRect()
-    requestAnimationFrame(() => {
-      clone.style.transition = 'left 900ms var(--ease),top 900ms var(--ease),width 900ms var(--ease),height 900ms var(--ease),border-radius 900ms var(--ease)'
-      clone.style.left = `${rect.left}px`; clone.style.top = `${rect.top}px`
-      clone.style.width = `${rect.width}px`; clone.style.height = `${rect.height}px`
-      clone.style.borderRadius = '40px'
-    })
-    setTimeout(() => { clone.remove(); busyRef.current = false }, 950)
-  }
+  const [contactOpen, setContactOpen] = useState(false)
+  const contactPanelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const zone = zoneRef.current!
-    const stage = stageRef.current!
-    if (!zone || !stage) return
-
-    function doSetActive(i: number) {
-      if (busyRef.current) return
-      busyRef.current = true
-      const next = (i + PROJECTS.length) % PROJECTS.length
-      activeIdxRef.current = next
-      setActiveIdxState(next)
-      setTimeout(() => { busyRef.current = false }, 930)
+    if (!contactOpen) return
+    contactPanelRef.current?.focus({ preventScroll: true })
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setContactOpen(false)
     }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [contactOpen])
 
-    function advance(dir: number) {
-      doSetActive(activeIdxRef.current + (dir > 0 ? 1 : -1))
-    }
-
-    function onWheel(e: WheelEvent) {
-      e.preventDefault()
-      if (busyRef.current) return
-      wheelAccumRef.current += e.deltaY
-      if (wheelTimerRef.current) clearTimeout(wheelTimerRef.current)
-      wheelTimerRef.current = setTimeout(() => { wheelAccumRef.current = 0 }, 130)
-      if (Math.abs(wheelAccumRef.current) > 32) {
-        const d = wheelAccumRef.current > 0 ? 1 : -1
-        wheelAccumRef.current = 0
-        advance(d)
-      }
-    }
-
-    function onPointerDown(e: PointerEvent) {
-      if (busyRef.current) return
-      dragStartRef.current = e.clientY
-      const card = (e.target as HTMLElement).closest('.project-card[data-pos="0"]') as HTMLElement | null
-      pressedIdxRef.current = card ? Number(card.dataset.index) : null
-      zone.classList.add('dragging')
-    }
-
-    function onPointerMove(e: PointerEvent) {
-      if (dragStartRef.current === null || busyRef.current) return
-      const dragY = e.clientY - dragStartRef.current
-      if (Math.abs(dragY) > 4 && !(zone as any).hasPointerCapture?.(e.pointerId)) {
-        (zone as any).setPointerCapture?.(e.pointerId)
-      }
-      const center = stage.querySelector('[data-pos="0"]') as HTMLElement | null
-      if (center && Math.abs(dragY) > 3) {
-        center.style.transition = 'none'
-        center.style.transform = `translate3d(0,${dragY * .18}px,0) rotateX(${dragY * -.012}deg) scale(${1 - Math.min(Math.abs(dragY) / 4500, .02)})`
-      }
-    }
-
-    function onPointerUp(e: PointerEvent) {
-      if (dragStartRef.current === null) return
-      const signedDrag = e.clientY - dragStartRef.current
-      const distance = Math.abs(signedDrag)
-      const tappedIdx = pressedIdxRef.current
-      const center = stage.querySelector('[data-pos="0"]') as HTMLElement | null
-      if (center) { center.style.transition = ''; center.style.transform = '' }
-      zone.classList.remove('dragging')
-      dragStartRef.current = null; pressedIdxRef.current = null
-
-      if (distance > 58) {
-        advance(signedDrag < 0 ? 1 : -1)
-      } else if (distance <= 10 && tappedIdx !== null && tappedIdx === activeIdxRef.current) {
-        openDetail(tappedIdx)
-      }
-    }
-
-    function onPointerCancel() {
-      const center = stage.querySelector('[data-pos="0"]') as HTMLElement | null
-      if (center) { center.style.transition = ''; center.style.transform = '' }
-      zone.classList.remove('dragging')
-      dragStartRef.current = null; pressedIdxRef.current = null
-    }
-
-    function onKeyDown(e: KeyboardEvent) {
-      if (detailOpenRef.current) { if (e.key === 'Escape') closeDetail(); return }
-      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') advance(1)
-      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') advance(-1)
-    }
-
-    zone.addEventListener('wheel', onWheel as EventListener, { passive: false })
-    zone.addEventListener('pointerdown', onPointerDown as EventListener)
-    zone.addEventListener('pointermove', onPointerMove as EventListener)
-    zone.addEventListener('pointerup', onPointerUp as EventListener)
-    zone.addEventListener('pointercancel', onPointerCancel)
-    document.addEventListener('keydown', onKeyDown)
-
-    return () => {
-      zone.removeEventListener('wheel', onWheel as EventListener)
-      zone.removeEventListener('pointerdown', onPointerDown as EventListener)
-      zone.removeEventListener('pointermove', onPointerMove as EventListener)
-      zone.removeEventListener('pointerup', onPointerUp as EventListener)
-      zone.removeEventListener('pointercancel', onPointerCancel)
-      document.removeEventListener('keydown', onKeyDown)
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const activeMenu = PROJECTS[activeIdx].key
+  const panelTabIndex = contactOpen ? 0 : -1
 
   return (
-    <>
-      <main className={`shell${leaving ? ' leaving' : ''}`}>
+    <main className="landing-page">
+      <SiteHeader home landingVariant="a" />
 
-        <div className="scene-zone">
-          <KeycapScene activeMenu={activeMenu} />
-        </div>
+      <section className="landing-section partner-section" id="partner" aria-labelledby="partner-title">
+        <LandingKeycapScene mode="partner" />
 
-        <section className="identity" aria-label="Brand">
-          <h1>GROVE<span>AI, engineered for AX.</span></h1>
-          <div className="utility">
-            <button className="icon-btn" aria-label="About Grove" title="About Grove">
-              <svg viewBox="0 0 24 24">
-                <path d="M4.7 19c.8-3.7 3.2-5.8 7.3-5.8s6.5 2.1 7.3 5.8" />
-                <circle cx="12" cy="8" r="3.4" />
-              </svg>
-            </button>
-            <button className="icon-btn" aria-label="Contact" title="Contact">
-              <svg viewBox="0 0 24 24">
-                <path d="M5 17.5l-.6 2.2 2.4-.8A7.7 7.7 0 1 0 4.3 13c0 1.7.5 3.2 1.4 4.5Z" />
-                <circle cx="9" cy="12" r=".7" fill="#151515" stroke="none" />
-                <circle cx="12" cy="12" r=".7" fill="#151515" stroke="none" />
-                <circle cx="15" cy="12" r=".7" fill="#151515" stroke="none" />
-              </svg>
-            </button>
-          </div>
-        </section>
-
-        <section
-          className="carousel-zone"
-          ref={zoneRef as React.RefObject<HTMLElement>}
-          aria-label="Project menu carousel"
-        >
-          <div className="carousel-stage" ref={stageRef}>
-            {PROJECTS.map((p, i) => (
-              <button
-                key={p.key}
-                className="project-card"
-                data-pos={String(getPos(i))}
-                data-index={String(i)}
-                type="button"
-                aria-label={`Open ${p.title}`}
-                onClick={() => { if (i === activeIdx && !busyRef.current) openDetail(i) }}
-              >
-                <div
-                  className="card-inner"
-                  style={{ '--tone': p.tone, '--titleColor': p.titleColor } as React.CSSProperties}
-                >
-                  <div dangerouslySetInnerHTML={{ __html: mockMarkup() }} />
-                  <div className="card-title">{p.title}</div>
-                  <div className="card-index">{String(i + 1).padStart(2, '0')}</div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <nav className="dots" aria-label="Project pagination">
-          {PROJECTS.map((p, i) => (
-            <button
-              key={p.key}
-              className={`dot${i === activeIdx ? ' active' : ''}`}
-              type="button"
-              aria-label={`Go to ${p.title}`}
-              onClick={() => {
-                if (busyRef.current || i === activeIdxRef.current) return
-                busyRef.current = true
-                activeIdxRef.current = i
-                setActiveIdxState(i)
-                setTimeout(() => { busyRef.current = false }, 930)
-              }}
-            />
-          ))}
-        </nav>
-        <div className="hint">Scroll / drag</div>
-      </main>
-
-      <section
-        className={`detail${detailOpen ? ' active' : ''}`}
-        aria-hidden={detailOpen ? 'false' : 'true'}
-        style={{ '--detailTone': detailProject.tone } as React.CSSProperties}
-      >
-        <button className="back" type="button" onClick={closeDetail}>Back</button>
-        <div className="detail-hero">
-          <div className="detail-browser" dangerouslySetInnerHTML={{ __html: mockMarkup() }} />
-          <div className="detail-copy">
-            <h2>{detailProject.title}</h2>
-            <p>{detailProject.desc}</p>
-          </div>
-        </div>
-        <div className="detail-body">
-          <p className="lead">{detailProject.lead}</p>
+        <div className="section-copy partner-copy">
+          <h1 id="partner-title">AI 이후의<br /><span>일하는 방식</span></h1>
+          <p className="partner-subcopy">디지털 서비스를 만들어온 경험 위에 AI를 연결합니다.<br />업무와 시스템을 넘어 기업이 일하는 방식까지.</p>
+          <a className="dark-link" href="#contact">
+            <span>WHAT&#39;S NEXT ?</span><b aria-hidden="true">↗</b>
+          </a>
         </div>
       </section>
-    </>
+
+      <section className="landing-section workflow-section" id="workflow" aria-labelledby="workflow-title">
+        <LandingKeycapScene mode="workflow" />
+
+        <div className="workflow-callouts" aria-hidden="true">
+          {workflowSteps.map(([key, label, top]) => (
+            <div className={`workflow-callout callout-${key}`} key={key} style={{ top }}>
+              <i /><span>{label}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="workflow-copy">
+          <h2 id="workflow-title"><span className="workflow-title-primary"><span>더 빠른 실행,</span></span><span>더 깊은 판단</span></h2>
+          <div>
+            AI는 반복과 실행의 범위를 넓히고,<br />전문가는 맥락과 기준이 필요한 판단에 집중합니다.
+          </div>
+          <a className="text-link workflow-button" href="#operate">
+            <span>구축부터 운영까지 보기</span><b aria-hidden="true">→</b>
+          </a>
+        </div>
+      </section>
+
+      <section className="landing-section operate-section" id="operate" aria-labelledby="operate-title">
+        <LandingKeycapScene mode="operate" />
+
+        <div className="section-copy operate-copy">
+          <h2 id="operate-title">비즈니스를<span>이해하는 AX</span></h2>
+          <p className="section-description">
+            기업마다 다른 업무와 데이터, 기준을 이해하고<br />
+            실제 업무 프로세스에 연결되는 AX를 설계합니다.
+          </p>
+          <Link className="text-link light-link" href="/works">
+            <span>분야별 프로젝트 보기</span><b aria-hidden="true">→</b>
+          </Link>
+        </div>
+
+        <div className="client-logo-stream" aria-label="그로브 고객사">
+          <div className="client-logo-track" aria-hidden="true">
+            {[0, 1].map((group) => (
+              <div className="client-logo-group" key={group}>
+                {clientLogos.map((logo) => (
+                  <span className={`client-logo client-logo--${logo.className}`} key={`${group}-${logo.name}`}>
+                    {logo.className === 'lg' && <i aria-hidden="true">●</i>}
+                    {logo.name}
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </section>
+
+      <section className={`landing-section contact-section${contactOpen ? ' contact-is-open' : ''}`} id="contact" aria-labelledby="contact-title">
+        <LandingKeycapScene mode="contact" />
+
+        <div className="contact-copy">
+          <h2 id="contact-title">새로운 방식의 <span style={{color:'var(--landing-orange)'}}>시작</span></h2>
+          <p className="contact-description">지금의 업무에 가장 먼저 달라져야 할 곳부터 찾습니다.</p>
+        </div>
+
+        <div className="contact-reveal" aria-hidden="true" />
+
+        <button
+          className="contact-toggle"
+          type="button"
+          aria-expanded={contactOpen}
+          aria-controls="contact-panel"
+          aria-label={contactOpen ? 'Contact 패널 닫고 랜딩페이지로 돌아가기' : 'Contact 패널 열고 첫 AX 과제 정하기'}
+          onClick={() => setContactOpen((open) => !open)}
+        >
+          <span className="contact-toggle-label" aria-hidden="true">
+            <span className="toggle-label-default">
+              <span style={{color:'var(--landing-orange)'}}>Let&#39;s Start!</span>
+              <svg className="contact-direction-arrow" viewBox="0 0 20 42" fill="none">
+                <path d="M10 40V4M10 4L4 11M10 4L16 11" />
+              </svg>
+            </span>
+            <span className="toggle-label-active">문의 닫기 <b>↺</b></span>
+          </span>
+        </button>
+
+        <div
+          className="contact-panel"
+          id="contact-panel"
+          ref={contactPanelRef}
+          role="region"
+          aria-labelledby="contact-panel-title"
+          aria-hidden={!contactOpen}
+          tabIndex={-1}
+        >
+          <div className="contact-panel-intro">
+            <p className="panel-index">IT CONSULTANCY <span>/ CONTACT</span></p>
+            <h3 id="contact-panel-title">무엇부터 바꿀까요?</h3>
+            <p className="contact-panel-lead">새로운 서비스부터 기존 시스템, 반복되는 업무까지.<br />지금 가장 필요한 변화에서 시작합니다.</p>
+
+            <dl className="contact-details">
+              <div><dt>Email</dt><dd><a href="mailto:request@grovesoft.net" tabIndex={panelTabIndex}>request@grovesoft.net</a></dd></div>
+              <div><dt>Call</dt><dd><a href="tel:0234822630" tabIndex={panelTabIndex}>02-3482-2630</a></dd></div>
+              <div><dt>Location</dt><dd>서울시 용산구 청파로 46 한통빌딩 12층</dd></div>
+            </dl>
+          </div>
+
+          <form className="contact-form" onSubmit={handleInquirySubmit}>
+            <p>어떤 변화를 생각하고 계신가요?</p>
+            <label><span>이름</span><input name="name" type="text" autoComplete="name" placeholder="성함 또는 회사명" disabled={!contactOpen} required /></label>
+            <label><span>연락처</span><input name="contact" type="text" autoComplete="email" placeholder="이메일 또는 전화번호" disabled={!contactOpen} required /></label>
+            <label><span>프로젝트 내용</span><textarea name="project" rows={4} placeholder="바꾸고 싶은 업무나 시스템, 만들고 싶은 서비스에 대해 자유롭게 남겨주세요." disabled={!contactOpen} required /></label>
+            <button type="submit" disabled={!contactOpen}><span>AX 과제 상담하기</span><b aria-hidden="true">↗</b></button>
+          </form>
+        </div>
+
+        <footer className="landing-footer">
+          <nav aria-label="하단 메뉴"><Link href="/about">회사소개</Link><Link href="/works">포트폴리오</Link></nav>
+          <p>2012–NOW · IT CONSULTING &amp; OPERATIONS</p>
+          <p>© 2026</p>
+        </footer>
+      </section>
+    </main>
   )
 }
