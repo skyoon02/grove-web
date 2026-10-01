@@ -687,14 +687,14 @@
     }
     /* Landing-E StoryFlow 레이아웃 */
     .flow-section:not(#contact) .flow-inner {
-      padding-top: clamp(42px,4.4vw,66px);
-      padding-bottom: clamp(28px,3.2vw,46px);
+      padding-top: clamp(34px,3.8vw,54px);
+      padding-bottom: clamp(28px,3vw,42px);
     }
     .lde-story-inner {
-      position: relative; flex: 1; min-height: 0; width: 100%; max-width: 1480px; margin-inline: auto; align-self: center;
-      display: grid; grid-template-columns: minmax(0,.82fr) minmax(0,1.18fr);
-      gap: clamp(48px,7vw,118px); align-items: stretch;
-      padding-top: clamp(28px,3.8vh,42px);
+      position: relative; flex: 1; min-height: 0; width: 100%; max-width: 1440px; margin-inline: auto; align-self: center;
+      display: grid; grid-template-columns: minmax(0,5fr) minmax(0,7fr);
+      gap: clamp(32px,4.8vw,76px); align-items: stretch;
+      padding-top: clamp(18px,2.5vh,28px);
       border-top: 1px solid color-mix(in srgb, currentColor 17%, transparent);
     }
     .lde-story-inner::before {
@@ -703,31 +703,32 @@
     }
     .lde-story-copy {
       position: relative; z-index: 1; min-width: 0;
-      display: flex; flex-direction: column; justify-content: flex-start;
-      padding: clamp(22px,4.5vh,50px) 0 clamp(14px,2.5vh,26px);
+      display: grid; grid-template-rows: auto minmax(0,1fr) auto;
+      grid-template-areas: "rail" "title" "desc";
+      padding: 0 0 clamp(12px,2.2vh,22px);
     }
     .lde-story-mode {
       display: block; margin-bottom: clamp(28px,4vh,48px);
       font-size: 15px; font-weight: 450; letter-spacing: -.015em; opacity: .55;
     }
     .lde-story-title {
-      max-width: 8.4ch; margin: 0;
-      font-size: clamp(66px,7.2vw,114px); font-weight: 240; line-height: 5;
-      letter-spacing: -.062em; text-wrap: balance; word-break: keep-all;
+      grid-area: title; align-self: center; max-width: none; margin: 0;
+      font-size: clamp(108px,10.65vw,168px); font-weight: 240; line-height: .86;
+      letter-spacing: -.068em; word-break: keep-all;
       font-feature-settings: "ss01" 1, "ss02" 1;
     }
     .lde-story-title-line { display: block; }
-    .lde-story-title-line:last-child { font-size: 1.08em; }
+    .lde-story-title-line:last-child { padding-left: clamp(28px,3.5vw,56px); }
     .lde-story-section--light .lde-story-title { font-weight: 320; }
     .lde-story-section--light .lde-story-title-line:first-child { color: rgba(17,17,17,.36); }
     .lde-story-section--dark .lde-story-title-line:first-child { color: rgba(238,234,226,.38); }
     .lde-story-desc {
-      max-width: 31ch; margin-top: clamp(48px,7vh,72px) !important;
+      grid-area: desc; align-self: start; max-width: 31ch; margin: 0 !important; transform: translateY(clamp(-120px,-12vh,-72px));
       font-size: clamp(15px,1.08vw,17px); font-weight: 280; line-height: 1.68;
       letter-spacing: -.025em; word-break: keep-all; opacity: .66; margin-bottom: 0; text-wrap: pretty;
     }
     .lde-story-visual {
-      position: relative; width: 100%; min-height: clamp(400px,61vh,620px);
+      position: relative; z-index: 1; width: 100%; min-height: clamp(440px,66vh,660px);
       cursor: grab; touch-action: pan-y; user-select: none;
     }
     .lde-story-visual::before {
@@ -738,8 +739,7 @@
     .lde-story-visual:active { cursor: grabbing; }
     .lde-story-visual canvas { position: absolute; inset: 0; width: 100%; height: 100%; outline: none; display: block; }
     .lde-service-rail {
-      width: 100%; margin-top: auto; padding-top: 18px;
-      border-top: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+      grid-area: rail; width: 100%; margin: 0; padding-top: 0; border-top: 0;
     }
     .lde-service-rail ul {
       display: flex; flex-wrap: wrap; gap: 6px 20px;
@@ -749,46 +749,22 @@
     }
     .lde-service-rail li { white-space: nowrap; }
     @media (min-width: 901px) {
-      .lde-story-inner { display: block; }
-      .lde-story-copy { position: static; padding: 0; }
-      .lde-story-title {
-        position: absolute; z-index: 3; top: 25%; left: 0;
-        max-width: none; width: min(76%,980px);
-        font-size: clamp(82px,8.8vw,138px); line-height: .9; letter-spacing: -.074em;
-        pointer-events: none;
-      }
-      .lde-story-title-line:last-child { padding-left: clamp(68px,7.4vw,126px); }
-      .lde-story-desc {
-        position: absolute; z-index: 3; top: 67%; left: clamp(68px,7.4vw,126px);
-        width: min(29ch,31%); margin-top: 0 !important;
-      }
-      .lde-service-rail {
-        position: absolute; z-index: 3; top: 18px; left: 0; width: min(42%,560px);
-        margin: 0; padding-top: 0; border-top: 0;
-      }
-      .lde-service-rail::after {
-        content: ""; position: absolute; top: -19px; left: 0; right: 0; height: 1px;
-        background: currentColor; opacity: .16;
-      }
-      .lde-story-visual {
-        position: absolute; z-index: 1; top: 0; right: -3%; bottom: 0;
-        width: 64%; min-height: 0;
-      }
-      .lde-story-section--dark .lde-story-visual { right: -1%; width: 61%; }
-      .lde-story-section--evolve .lde-story-visual { right: -2%; width: 62%; }
-      .lde-story-section .flow-inner { padding-bottom: 0; }
+      .lde-story-visual { align-self: stretch; min-height: 0; }
     }
     @media (max-width: 900px) {
       .flow-section:not(#contact) .flow-inner { padding: 34px 20px 26px; }
-      .lde-story-inner { grid-template-columns: 1fr; gap: 0; padding-top: 18px; }
-      .lde-story-copy { padding: 28px 0 0; }
-      .lde-story-visual { min-height: clamp(238px,38vh,300px); margin-top: 16px; }
+      .lde-story-inner { grid-template-columns: 1fr; gap: 18px; padding-top: 16px; }
+      .lde-story-copy { padding: 0; }
+      .lde-story-title { margin-top: clamp(44px,7vh,64px); }
+      .lde-story-desc { margin-top: 24px !important; }
+      .lde-story-visual { min-height: clamp(280px,42vh,380px); margin-top: 0; }
     }
     @media (max-width: 760px) {
       .lde-story-mode { margin-bottom: 24px; font-size: 13px; }
-      .lde-story-title { max-width: 7.8ch; font-size: clamp(54px,14vw,68px); line-height: 5; letter-spacing: -.052em; }
-      .lde-story-desc { max-width: 29ch; font-size: 14px; line-height: 1.62; margin-top: 26px !important; opacity: .68; }
-      .lde-service-rail { margin-top: 32px; padding-top: 13px; grid-template-columns: 76px 1fr; gap: 12px; }
+      .lde-story-title { max-width: none; font-size: clamp(78px,21vw,99px); line-height: .88; letter-spacing: -.058em; }
+      .lde-story-title-line:last-child { padding-left: clamp(20px,7vw,34px); }
+      .lde-story-desc { max-width: 29ch; font-size: 14px; line-height: 1.62; margin-top: 22px !important; opacity: .68; }
+      .lde-service-rail { grid-template-columns: 76px 1fr; gap: 12px; }
       .lde-service-rail-label { font-size: 8px; }
       .lde-service-rail ul { gap: 8px; font-size: 10px; }
     }
@@ -1686,8 +1662,8 @@
 
     <!-- ===== Landing-E Portfolio Carousel ===== -->
     <style>
-      .ag-section { position: relative; z-index: 1; width: 100%; height: calc(100dvh + min(1200px,100vw)); background: #050708; scroll-margin-top: 0; }
-      .ag-container { position: sticky; top: 0; width: 100%; height: 100dvh; overflow: hidden; isolation: isolate; background: transparent; color: #f2f2ed; cursor: grab; touch-action: pan-y; }
+      .ag-section { position: relative; z-index: 1; width: 100%; height: 100dvh; background: #050708; scroll-margin-top: 0; }
+      .ag-container { position: relative; width: 100%; height: 100%; overflow: hidden; isolation: isolate; background: transparent; color: #f2f2ed; cursor: grab; touch-action: pan-y; }
       .ag-container::before { content: ""; position: absolute; z-index: 0; inset: 0; pointer-events: none; background: linear-gradient(90deg,rgba(4,6,7,.72) 0%,rgba(4,6,7,.58) 28%,rgba(4,6,7,.24) 58%,rgba(4,6,7,.08) 78%),linear-gradient(180deg,rgba(3,5,6,.14),rgba(3,5,6,.22) 45%,rgba(3,5,6,.7)),radial-gradient(ellipse at center,#cad5b50d,transparent 68%); }
       .ag-container[data-dragging] { cursor: grabbing; }
       .ag-strip { position: absolute; z-index: 1; inset: 0; perspective: 1800px; perspective-origin: 50% 48%; transform-style: preserve-3d; }
@@ -1710,7 +1686,6 @@
       .ag-container[data-moving] .ag-card-copy { opacity: .44; transform: translateY(5px); }
       .ag-container[data-moving] .ag-card-number { opacity: .58; transform: translateY(3px); }
       .ag-controls { position: absolute; z-index: 5; right: clamp(24px,4vw,58px); bottom: clamp(28px,4vw,52px); display: flex; align-items: center; gap: 16px; color: #d8dcd1; }
-      .ag-status { min-width: 54px; font-size: 10px; font-weight: 560; letter-spacing: .12em; font-variant-numeric: tabular-nums; }
       .ag-control-button { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid rgba(242,242,237,.2); border-radius: 50%; background: rgba(5,7,8,.5); color: inherit; cursor: pointer; backdrop-filter: blur(12px); transition: background-color .22s ease, border-color .22s ease, transform .22s ease; }
       .ag-control-button:hover, .ag-control-button:focus-visible { background: rgba(242,242,237,.12); border-color: rgba(242,242,237,.5); transform: translateY(-2px); }
       .ag-control-button:active { transform: scale(.96); }
@@ -1760,7 +1735,6 @@
         </div>
 
         <div class="ag-controls" aria-label="프로젝트 탐색">
-          <span class="ag-status" id="ag-status" aria-live="polite">01 / 03</span>
           <button class="ag-control-button" id="ag-prev" type="button" aria-label="이전 프로젝트">←</button>
           <button class="ag-control-button" id="ag-next" type="button" aria-label="다음 프로젝트">→</button>
         </div>
@@ -1774,7 +1748,6 @@
       var section = document.getElementById('portfolio');
       var container = document.getElementById('ag-container');
       var strip = document.getElementById('ag-strip');
-      var status = document.getElementById('ag-status');
       var previousButton = document.getElementById('ag-prev');
       var nextButton = document.getElementById('ag-next');
       if (!section || !container || !strip) return;
@@ -1791,14 +1764,22 @@
 
       function clamp(v, lo, hi) { return Math.min(Math.max(v, lo), hi); }
       function lerp(a, b, t) { return a + (b - a) * t; }
-      function projectIndex(value) { return ((Math.round(value) - CENTRAL) % N + N) % N; }
-      function updateStatus() {
-        if (status) status.textContent = String(projectIndex(current) + 1).padStart(2, '0') + ' / 03';
-      }
 
       function measure() {
         viewportWidth = container.clientWidth;
         radius = clamp(viewportWidth * 0.38, 280, 520);
+      }
+
+      // Keep the carousel infinitely rotatable without letting its internal
+      // coordinates grow forever. Moving by TOTAL cards is one exact visual
+      // revolution, so rebasing all three values by that amount is invisible.
+      function rebaseInfinitePosition() {
+        var revolutions = Math.trunc((target - CENTRAL) / TOTAL);
+        if (!revolutions) return;
+        var shift = revolutions * TOTAL;
+        current -= shift;
+        target -= shift;
+        drag.offset -= shift;
       }
 
       function markMoving() {
@@ -1809,17 +1790,15 @@
           var snapped = Math.round(target);
           drag.offset += snapped - target;
           target = snapped;
+          rebaseInfinitePosition();
           requestRender();
           delete container.dataset.moving;
         }, 170);
       }
 
       function syncTarget() {
-        var rect = section.getBoundingClientRect();
-        var travel = Math.max(section.offsetHeight - container.clientHeight, 1);
-        var progress = clamp(-rect.top / travel, 0, 1);
-        drag.offset = clamp(drag.offset, -(N * 0.9), N * 0.9);
-        target = CENTRAL + progress * (N - 1) + drag.offset;
+        target = CENTRAL + drag.offset;
+        rebaseInfinitePosition();
       }
 
       function render() {
@@ -1843,21 +1822,17 @@
           var link = card.querySelector('a');
           if (link) link.tabIndex = active ? 0 : -1;
         });
-        updateStatus();
-
         if (Math.abs(target - current) > 0.04 && visible) frame = requestAnimationFrame(render);
         else frame = 0;
       }
 
       function requestRender() { if (!visible || frame) return; frame = requestAnimationFrame(render); }
 
-      window.addEventListener('scroll', function() {
-        syncTarget(); markMoving(); requestRender();
-        if (section.getBoundingClientRect().top < -24) container.dataset.interacted = '1';
-      }, { passive: true });
-
       container.addEventListener('pointerdown', function(e) {
-        if (e.target.closest('.ag-controls')) return;
+        if (e.target.closest('.ag-controls')) {
+          drag.dragged = false;
+          return;
+        }
         if (e.pointerType === 'mouse' && e.button !== 0) return;
         drag.active = true; drag.dragged = false; drag.pid = e.pointerId; drag.startX = e.clientX; drag.lastX = e.clientX;
       });
@@ -1881,7 +1856,17 @@
       }
       container.addEventListener('pointerup', endDrag);
       container.addEventListener('pointercancel', endDrag);
-      container.addEventListener('click', function(e) { if (drag.dragged) { e.preventDefault(); e.stopPropagation(); } }, true);
+      container.addEventListener('click', function(e) {
+        if (e.target.closest('.ag-controls')) {
+          drag.dragged = false;
+          return;
+        }
+        if (drag.dragged) {
+          e.preventDefault();
+          e.stopPropagation();
+          drag.dragged = false;
+        }
+      }, true);
       container.addEventListener('keydown', function(e) {
         if (!['ArrowLeft','ArrowRight'].includes(e.key)) return;
         e.preventDefault();
@@ -1937,6 +1922,10 @@
       .conversation-module__oga6UW__contactSide {
         display: flex; justify-content: flex-end; align-items: flex-end; gap: 28px; margin-top: clamp(22px,3vh,34px);
       }
+      .conversation-module__oga6UW__contactSide > div {
+        width: min(100%, 660px); display: grid; grid-template-columns: minmax(0,1fr) auto;
+        align-items: end; gap: clamp(28px,3.2vw,52px);
+      }
       .conversation-module__oga6UW__storyContactLead {
         color: #aeb4a4; font-size: 16px; line-height: 1.7; letter-spacing: -.025em; word-break: keep-all; margin: 0;
       }
@@ -1948,7 +1937,14 @@
         justify-content: space-between; align-items: center; gap: 24px;
         padding-top: clamp(14px,2vh,20px); border-top: 1px solid var(--line); color: #a5ab9a; font-size: 11px;
       }
-      .conversation-module__oga6UW__contactFooterLinks { display: flex; gap: 28px; }
+      #contact .lde-contact-inner > div.conversation-module__oga6UW__contactFooterRow {
+        width: auto; margin-inline: clamp(24px,6vw,104px);
+        display: grid; grid-template-columns: repeat(3,minmax(0,1fr));
+        align-items: baseline; column-gap: clamp(24px,4vw,64px);
+      }
+      .conversation-module__oga6UW__contactFooterLinks { display: contents; }
+      .conversation-module__oga6UW__contactFooterLinks a:first-child { justify-self: center; }
+      .conversation-module__oga6UW__contactFooterLinks a:last-child { justify-self: end; }
       .conversation-module__oga6UW__contactFooterLinks a { color: inherit; text-decoration: none; }
       .conversation-module__oga6UW__contactFooterRow a:hover { color: var(--text); }
       .conversation-module__oga6UW__contactCta {
@@ -1967,6 +1963,11 @@
       .conversation-module__oga6UW__contactCta:hover .conversation-module__oga6UW__contactCtaIcon {
         transform: translate(2px,-1px) scale(1.08);
       }
+      .conversation-module__oga6UW__ctaSubCopy {
+        max-width: 21ch; margin: 0; color: rgba(238,234,226,.68);
+        font-size: clamp(16px,1.3vw,20px); font-weight: 330; line-height: 1.48;
+        letter-spacing: -.035em; word-break: keep-all; text-align: left;
+      }
       /* Backdrop + Drawer */
       .conversation-module__oga6UW__contactBackdrop {
         position: fixed; inset: 0; z-index: 199; background: rgba(0,0,0,.45);
@@ -1976,8 +1977,8 @@
         opacity: 1; visibility: visible; pointer-events: auto; transition-delay: 0s;
       }
       .conversation-module__oga6UW__contactDrawer {
-        position: fixed; z-index: 200; inset: 0 0 0 auto; width: min(1120px,84vw); min-width: 580px;
-        display: flex; flex-direction: column; padding: clamp(70px,6vw,96px) clamp(36px,5vw,80px);
+        position: fixed; z-index: 200; inset: 0 0 0 auto; width: min(1040px,88vw); min-width: 620px;
+        display: flex; flex-direction: column; padding: clamp(76px,7vh,96px) clamp(42px,5vw,76px) clamp(56px,6vh,76px);
         background: #111210; color: #f1f0ea; border-left: 1px solid rgba(255,255,255,.12);
         transform: translateX(100%); visibility: hidden; pointer-events: none;
         transition: transform .65s var(--ease), visibility 0s linear .65s; overflow-y: auto;
@@ -1986,41 +1987,53 @@
         transform: translateX(0); visibility: visible; pointer-events: auto; transition-delay: 0s;
       }
       .conversation-module__oga6UW__drawerClose {
-        position: absolute; top: 45px; right: 45px; width: 52px; height: 52px;
-        padding: 0; background: transparent; border: 0; cursor: pointer;
+        position: absolute; top: 28px; right: 30px; width: 48px; height: 48px;
+        padding: 0; background: transparent; border: 0; border-radius: 50%; cursor: pointer;
+        opacity: .72; transition: opacity .25s ease, background-color .25s ease;
       }
+      .conversation-module__oga6UW__drawerClose:hover,
+      .conversation-module__oga6UW__drawerClose:focus-visible { opacity: 1; background: rgba(255,255,255,.06); outline: none; }
       .conversation-module__oga6UW__drawerClose::before,
       .conversation-module__oga6UW__drawerClose::after {
-        content: ''; position: absolute; left: 50%; top: 50%; width: 48px; height: 1px; background: #f1f0ea;
+        content: ''; position: absolute; left: 50%; top: 50%; width: 34px; height: 1px; background: #f1f0ea;
       }
       .conversation-module__oga6UW__drawerClose::before { transform: translate(-50%,-50%) rotate(45deg); }
       .conversation-module__oga6UW__drawerClose::after  { transform: translate(-50%,-50%) rotate(-45deg); }
       .conversation-module__oga6UW__drawerBody {
-        display: grid; grid-template-columns: 1fr 1fr; gap: clamp(36px,5vw,80px); align-items: start; flex: 1;
+        display: grid; grid-template-columns: minmax(280px,.8fr) minmax(390px,1.2fr);
+        gap: clamp(54px,6vw,88px); align-items: start; width: 100%; max-width: 930px; margin: auto 0;
       }
-      .conversation-module__oga6UW__drawerLeft { display: flex; flex-direction: column; }
+      .conversation-module__oga6UW__drawerLeft { display: flex; flex-direction: column; min-width: 0; }
+      .conversation-module__oga6UW__drawerIntro { display: grid; gap: clamp(30px,4vh,44px); }
       .conversation-module__oga6UW__drawerTitle {
-        margin: 0 0 clamp(28px,3.5vh,48px) !important; font-size: clamp(44px,4.8vw,76px);
-        line-height: .91; letter-spacing: -.072em; font-weight: 610;
+        margin: 0 !important; font-size: clamp(52px,5vw,72px);
+        line-height: .91; letter-spacing: -.065em; font-weight: 310;
       }
       .conversation-module__oga6UW__drawerLead {
-        max-width: 28ch; margin: 0 0 clamp(36px,5vh,60px) !important;
-        font-size: clamp(14px,1.1vw,17px); font-weight: 430; line-height: 1.72;
+        max-width: 28ch; margin: 0 !important;
+        font-size: clamp(14px,1.05vw,16px); font-weight: 360; line-height: 1.72;
         letter-spacing: -.025em; word-break: keep-all;
       }
-      .conversation-module__oga6UW__drawerInfoList { display: grid; gap: 20px; padding: 0; margin: 0; }
-      .conversation-module__oga6UW__drawerInfoRow {
-        display: grid; grid-template-columns: 80px 1fr; gap: 16px; align-items: baseline; font-size: clamp(14px,1.1vw,17px);
+      .conversation-module__oga6UW__drawerInfoList {
+        display: grid; gap: 0; padding: 0; margin: clamp(34px,5vh,52px) 0 0;
+        border-top: 1px solid rgba(255,255,255,.16);
       }
-      .conversation-module__oga6UW__drawerInfoRow dt { font-weight: 750; }
-      .conversation-module__oga6UW__drawerInfoRow dd { margin: 0; word-break: keep-all; }
+      .conversation-module__oga6UW__drawerInfoRow {
+        display: grid; grid-template-columns: 68px minmax(0,1fr); gap: 14px; align-items: baseline;
+        padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.12); font-size: clamp(13px,1vw,15px);
+      }
+      .conversation-module__oga6UW__drawerInfoRow dt { color: #9d9e97; font-size: 11px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; }
+      .conversation-module__oga6UW__drawerInfoRow dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
       .conversation-module__oga6UW__drawerInfoRow a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; transition: border-color .2s; }
       .conversation-module__oga6UW__drawerInfoRow a:hover { border-color: currentColor; }
-      .conversation-module__oga6UW__drawerForm { display: flex; flex-direction: column; gap: 28px; }
-      .conversation-module__oga6UW__drawerFormTitle {
-        margin: 0 0 4px !important; font-size: clamp(17px,1.4vw,22px); font-weight: 600; letter-spacing: -.03em; line-height: 1.3;
+      .conversation-module__oga6UW__drawerForm {
+        display: flex; flex-direction: column; gap: clamp(20px,2.6vh,26px);
+        min-width: 0; padding-left: clamp(38px,4.5vw,64px); border-left: 1px solid rgba(255,255,255,.14);
       }
-      .conversation-module__oga6UW__drawerField { display: flex; flex-direction: column; gap: 7px; }
+      .conversation-module__oga6UW__drawerFormTitle {
+        margin: 0 0 8px !important; font-size: clamp(18px,1.45vw,22px); font-weight: 600; letter-spacing: -.035em; line-height: 1.35;
+      }
+      .conversation-module__oga6UW__drawerField { display: flex; flex-direction: column; gap: 6px; }
       .conversation-module__oga6UW__drawerLabel {
         font-size: 11px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: #9d9e97;
       }
@@ -2035,32 +2048,48 @@
       .conversation-module__oga6UW__drawerTextarea::placeholder { color: rgba(241,240,234,.38); }
       .conversation-module__oga6UW__drawerInput:focus,
       .conversation-module__oga6UW__drawerTextarea:focus { border-bottom-color: #f1f0ea; }
-      .conversation-module__oga6UW__drawerTextarea { min-height: 120px; }
+      .conversation-module__oga6UW__drawerTextarea { min-height: 132px; }
       .conversation-module__oga6UW__drawerSubmit {
-        align-self: flex-start; margin-top: 8px; padding: 14px 28px;
+        align-self: flex-start; min-height: 48px; margin-top: 2px; padding: 14px 28px;
         background: #f1f0ea; color: #171814; font: inherit; font-size: 14px; font-weight: 600;
         letter-spacing: -.01em; border: 0; border-radius: 4px; cursor: pointer; transition: opacity .2s;
       }
       .conversation-module__oga6UW__drawerSubmit:hover { opacity: .82; }
       .conversation-module__oga6UW__drawerSubmit:active { transform: translateY(1px) scale(.98); }
       .conversation-module__oga6UW__drawerStatus { min-height: 1.4em; margin: -12px 0 0; color: #b9bcb3; font-size: 12px; line-height: 1.4; }
+      @media (max-width: 900px) {
+        .conversation-module__oga6UW__contactDrawer { width: 100%; min-width: 0; }
+        .conversation-module__oga6UW__drawerBody { grid-template-columns: 1fr; gap: 42px; max-width: 680px; margin: 0 auto; }
+        .conversation-module__oga6UW__drawerForm { padding: 38px 0 0; border-left: 0; border-top: 1px solid rgba(255,255,255,.14); }
+      }
       @media (max-width: 720px) {
         .lde-contact-inner { padding: 66px 0 20px !important; }
         .conversation-module__oga6UW__contactTop { padding-inline: 24px; }
         .conversation-module__oga6UW__contactTop h2 { font-size: clamp(42px,9.4vw,68px); line-height: .9; letter-spacing: -.065em; font-weight: 260; }
         .conversation-module__oga6UW__contactSide { margin-top: 22px; flex-direction: column; align-items: flex-start; gap: 18px; }
+        .conversation-module__oga6UW__contactSide > div { width: 100%; grid-template-columns: 1fr; gap: 18px; }
+        .conversation-module__oga6UW__ctaSubCopy { max-width: 24ch; font-size: 15px; line-height: 1.55; }
         .conversation-module__oga6UW__storyContactLead { font-size: 14px; }
         .conversation-module__oga6UW__contactParticle { flex-basis: 150px; min-height: 0; margin-top: 10px; }
-        .conversation-module__oga6UW__contactFooterRow { margin-inline: 24px; flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 12px; font-size: 10px; }
-        .conversation-module__oga6UW__contactFooterLinks { width: 100%; justify-content: space-between; gap: 16px; }
-        .conversation-module__oga6UW__contactDrawer { width: 100%; min-width: 0; padding: 88px 26px 48px; }
-        .conversation-module__oga6UW__drawerClose { top: 24px; right: 22px; width: 42px; height: 42px; }
+        #contact .lde-contact-inner > div.conversation-module__oga6UW__contactFooterRow {
+          margin-inline: 24px; display: flex; flex-direction: column; align-items: stretch;
+          gap: 10px; padding-top: 12px; font-size: 10px;
+        }
+        .conversation-module__oga6UW__contactFooterLinks { width: 100%; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 16px; }
+        .conversation-module__oga6UW__contactFooterLinks a:first-child { justify-self: start; }
+        .conversation-module__oga6UW__contactDrawer { padding: 82px 24px 40px; }
+        .conversation-module__oga6UW__drawerClose { top: 20px; right: 18px; width: 42px; height: 42px; }
         .conversation-module__oga6UW__drawerClose::before,
-        .conversation-module__oga6UW__drawerClose::after { width: 34px; }
-        .conversation-module__oga6UW__drawerTitle { font-size: 52px; }
+        .conversation-module__oga6UW__drawerClose::after { width: 30px; }
+        .conversation-module__oga6UW__drawerTitle { font-size: clamp(46px,13vw,54px); }
         .conversation-module__oga6UW__drawerLead { font-size: 14px; }
-        .conversation-module__oga6UW__drawerInfoRow { font-size: 14px; }
-        .conversation-module__oga6UW__drawerBody { grid-template-columns: 1fr; gap: 40px; }
+        .conversation-module__oga6UW__drawerInfoList { margin-top: 30px; }
+        .conversation-module__oga6UW__drawerInfoRow { grid-template-columns: 62px minmax(0,1fr); padding: 13px 0; font-size: 14px; }
+        .conversation-module__oga6UW__drawerBody { gap: 34px; }
+        .conversation-module__oga6UW__drawerForm { gap: 22px; padding-top: 32px; }
+        .conversation-module__oga6UW__drawerFormTitle { margin-bottom: 4px !important; }
+        .conversation-module__oga6UW__drawerTextarea { min-height: 112px; }
+        .conversation-module__oga6UW__drawerSubmit { width: 100%; justify-content: center; }
       }
       @media (min-width: 721px) and (max-height: 760px) {
         .lde-contact-inner { padding-top: 58px !important; padding-bottom: 18px !important; }
@@ -2076,13 +2105,13 @@
         <div class="flow-inner" style="background:#f4f4f2;color:#111">
           <div class="lde-story-inner">
             <div class="lde-story-copy">
-              <h2 class="lde-story-title" id="b-stage-0"><span class="lde-story-title-line">고민에서,</span><span class="lde-story-title-line">핵심으로.</span></h2>
-              <p class="lde-story-desc">무엇이 필요한지 분명해지도록,<br>고민의 본질부터 다시 정의하는 그로브</p>
+              <h2 class="lde-story-title" id="b-stage-0"><span class="lde-story-title-line">SEE THE</span><span class="lde-story-title-line">WHOLE.</span></h2>
+              <p class="lde-story-desc">업무와 시스템을 함께 보고,<br>무엇을 만들지보다 무엇을 바꿀지부터.</p>
               <div class="lde-service-rail">
                 <ul>
                   <li>Consulting</li>
                   <li>Strategy</li>
-                  <li>Planning</li>
+                  <li>Design</li>
                 </ul>
               </div>
             </div>
@@ -2097,11 +2126,11 @@
         <div class="flow-inner" style="background:#111;color:#eeeae2">
           <div class="lde-story-inner">
             <div class="lde-story-copy">
-              <h2 class="lde-story-title" id="b-stage-1"><span class="lde-story-title-line">생각에서,</span><span class="lde-story-title-line">실행으로.</span></h2>
-              <p class="lde-story-desc">전략이 현실이 되도록, 기획부터 개발까지 전 과정을 책임지는 그로브</p>
+              <h2 class="lde-story-title" id="b-stage-1"><span class="lde-story-title-line">MAKE IT</span><span class="lde-story-title-line">WORK.</span></h2>
+              <p class="lde-story-desc">정한 방향을 실행 가능한 구조로,<br>서비스와 AI 시스템까지 연결.</p>
               <div class="lde-service-rail">
                 <ul>
-                  <li>Planning</li>
+                  <li>Systems</li>
                   <li>Development</li>
                   <li>AI</li>
                 </ul>
@@ -2118,8 +2147,8 @@
         <div class="flow-inner" style="background:#f4f4f2;color:#111">
           <div class="lde-story-inner">
             <div class="lde-story-copy">
-              <h2 class="lde-story-title" id="b-stage-2"><span class="lde-story-title-line">운영에서,</span><span class="lde-story-title-line">확장으로.</span></h2>
-              <p class="lde-story-desc">변화가 일하는 방식이 되도록,<br>서비스의 다음 단계까지 설계하는 그로브</p>
+              <h2 class="lde-story-title" id="b-stage-2"><span class="lde-story-title-line" style="color:#111111">STAY</span><span class="lde-story-title-line" style="color:rgba(17,17,17,.36)">WITH IT.</span></h2>
+              <p class="lde-story-desc">운영과 고도화를 이어가며,<br>변화가 일하는 방식으로 자리 잡는 데까지.</p>
               <div class="lde-service-rail">
                 <ul>
                   <li>Operations</li>
@@ -2141,8 +2170,9 @@
             <h2 aria-labelledby="b-contact-title" id="b-contact-title"><span>Let's find</span><br>your CORE.</h2>
             <div class="conversation-module__oga6UW__contactSide">
               <div>
+                <p class="conversation-module__oga6UW__ctaSubCopy">방향을 잡는 단계여도 좋습니다.<br>고민을 알려주세요.</p>
                 <button type="button" class="conversation-module__oga6UW__contactCta js-lde-open">
-                  변화를 함께 만들기
+                  핵심부터 함께 찾기
                   <span class="conversation-module__oga6UW__contactCtaIcon" aria-hidden="true">↗</span>
                 </button>
               </div>
@@ -2167,8 +2197,10 @@
     <button type="button" class="conversation-module__oga6UW__drawerClose" id="lde-drawer-close" aria-label="상담 패널 닫기"></button>
     <div class="conversation-module__oga6UW__drawerBody">
       <div class="conversation-module__oga6UW__drawerLeft">
-        <h2 class="conversation-module__oga6UW__drawerTitle" id="b-drawer-title">어디까지<br>바꿀까요?</h2>
-        <p class="conversation-module__oga6UW__drawerLead">사용자가 보는 경험부터 화면 뒤에서 움직이는 업무까지.<br>지금 필요한 변화를 함께 설계합니다.</p>
+        <div class="conversation-module__oga6UW__drawerIntro">
+          <h2 class="conversation-module__oga6UW__drawerTitle" id="b-drawer-title">WHAT'S<br>YOUR CORE?</h2>
+          <p class="conversation-module__oga6UW__drawerLead">복잡한 문제일수록<br>먼저 찾아야 할 핵심이 있습니다.<br>그로브는 거기서 시작합니다.</p>
+        </div>
         <dl class="conversation-module__oga6UW__drawerInfoList">
           <div class="conversation-module__oga6UW__drawerInfoRow">
             <dt>Call</dt>
@@ -2181,7 +2213,7 @@
         </dl>
       </div>
       <form class="conversation-module__oga6UW__drawerForm" id="lde-contact-form">
-        <p class="conversation-module__oga6UW__drawerFormTitle">어떤 경험과 업무를 바꾸고 싶으신가요?</p>
+        <p class="conversation-module__oga6UW__drawerFormTitle">지금 어떤 문제를 풀고 계신가요?</p>
         <div class="conversation-module__oga6UW__drawerField">
           <label class="conversation-module__oga6UW__drawerLabel" for="lde-name">이름</label>
           <input id="lde-name" name="name" class="conversation-module__oga6UW__drawerInput" type="text" placeholder="성함 또는 회사명" autocomplete="name" required>
@@ -2192,9 +2224,9 @@
         </div>
         <div class="conversation-module__oga6UW__drawerField">
           <label class="conversation-module__oga6UW__drawerLabel" for="lde-desc">프로젝트 내용</label>
-          <textarea id="lde-desc" name="project" class="conversation-module__oga6UW__drawerTextarea" placeholder="바꾸고 싶은 경험이나 업무, 만들고 싶은 서비스에 대해 자유롭게 남겨주세요." rows="5" required></textarea>
+          <textarea id="lde-desc" name="project" class="conversation-module__oga6UW__drawerTextarea" placeholder="현재의 문제, 바꾸고 싶은 업무 또는&#10;만들고 싶은 서비스에 대해 자유롭게 남겨주세요." rows="5" required></textarea>
         </div>
-        <button type="submit" class="conversation-module__oga6UW__drawerSubmit">보내기 <span aria-hidden="true">↗</span></button>
+        <button type="submit" class="conversation-module__oga6UW__drawerSubmit">LET'S FIND IT <span aria-hidden="true">↗</span></button>
         <p class="conversation-module__oga6UW__drawerStatus" id="lde-form-status" role="status" aria-live="polite"></p>
       </form>
     </div>
@@ -2317,18 +2349,34 @@
         if (!inner) return;
 
         if (i > 0 && !reducedMotion) {
-          gsap.set(inner, { rotation: entryRotation, transformOrigin: 'bottom left' });
+          gsap.set(inner, {
+            rotation: entryRotation,
+            transformOrigin: 'bottom left',
+            force3D: true,
+          });
           gsap.to(inner, {
             rotation: 0,
             ease: 'none',
-            scrollTrigger: { trigger: section, start: 'top bottom', end: 'top 25%', scrub: true },
+            force3D: true,
+            scrollTrigger: {
+              trigger: section,
+              start: 'top bottom',
+              end: 'top top',
+              scrub: true,
+              invalidateOnRefresh: true,
+            },
           });
         }
 
         if (i < sections.length - 1) {
           ScrollTrigger.create({
-            trigger: section, start: 'bottom bottom', end: 'bottom top',
-            pin: true, pinSpacing: false,
+            trigger: section,
+            start: 'top top',
+            end: '+=100%',
+            pin: true,
+            pinSpacing: false,
+            anticipatePin: 0,
+            invalidateOnRefresh: true,
           });
         }
       });
