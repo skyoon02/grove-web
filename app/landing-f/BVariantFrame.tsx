@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import SiteHeader from "../SiteHeader";
 
 type HeaderBridgeMessage = {
-  type: "grove-c-landing-header";
+  type: "grove-b-landing-header";
   isLight: boolean;
   isVisible: boolean;
 };
@@ -13,13 +13,13 @@ function isHeaderBridgeMessage(value: unknown): value is HeaderBridgeMessage {
   if (!value || typeof value !== "object") return false;
   const message = value as Partial<HeaderBridgeMessage>;
   return (
-    message.type === "grove-c-landing-header" &&
+    message.type === "grove-b-landing-header" &&
     typeof message.isLight === "boolean" &&
     typeof message.isVisible === "boolean"
   );
 }
 
-export default function CVariantFrame() {
+export default function BVariantFrame() {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [headerLight, setHeaderLight] = useState(true);
   const [headerVisible, setHeaderVisible] = useState(true);
@@ -41,15 +41,15 @@ export default function CVariantFrame() {
   return (
     <main className="b-landing-shell">
       <SiteHeader
-        landingVariant="c"
+        landingVariant="b"
         controlledLight={headerLight}
         controlledVisible={headerVisible}
       />
       <iframe
         ref={frameRef}
         className="b-landing-frame"
-        src="/landing-c/source/"
-        title="GROVE C안 랜딩페이지 — B안 원본 백업"
+        src="/landing-f/source/"
+        title="GROVE B안 랜딩페이지"
       />
     </main>
   );

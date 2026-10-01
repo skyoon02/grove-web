@@ -4,9 +4,10 @@ import { extname, join, resolve, sep } from "node:path";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const OFFLINE_ROOT = resolve(process.cwd(), "public/landing-c-snapshot");
+const OFFLINE_ROOT = resolve(process.cwd(), "offline-package");
+const HTML_ROOT = resolve(process.cwd(), "public/landing-b-g-snapshot");
 const INDEX_FILE = "index.html";
-const DOCUMENT_BASE = '<base href="/landing-c/source/">';
+const DOCUMENT_BASE = '<base href="/landing-b/source/">';
 
 const CONTENT_TYPES: Record<string, string> = {
   ".css": "text/css; charset=utf-8",
@@ -81,7 +82,7 @@ const HEADER_BRIDGE = String.raw`
       }
 
       window.parent.postMessage({
-        type: 'grove-b-landing-header',
+        type: 'grove-c-landing-header',
         isLight: getLightHeaderState(),
         isVisible: isVisible
       }, window.location.origin);
@@ -96,12 +97,6 @@ const HEADER_BRIDGE = String.raw`
     window.addEventListener('scroll', scheduleHeaderState, { passive: true });
     window.addEventListener('resize', scheduleHeaderState);
     window.addEventListener('grove:intro-done', scheduleHeaderState, { once: true });
-    window.addEventListener('message', function (event) {
-      if (event.origin !== window.location.origin || event.source !== window.parent) return;
-      if (!event.data || event.data.type !== 'grove-f-open-contact') return;
-      var contactTrigger = document.querySelector('.js-lde-open');
-      if (contactTrigger) contactTrigger.click();
-    });
     postHeaderState();
   })();
 </script>`;
@@ -123,14 +118,16 @@ export async function GET(
   context: { params: Promise<{ asset?: string[] }> },
 ) {
   const { asset = [] } = await context.params;
-  const segments = asset.length ? asset : [INDEX_FILE];
+  const isIndex = asset.length === 0;
+  const segments = isIndex ? [INDEX_FILE] : asset;
 
   if (!isSafeAssetPath(segments)) {
     return new Response("Not found", { status: 404 });
   }
 
-  const filePath = resolve(join(OFFLINE_ROOT, ...segments));
-  if (filePath !== OFFLINE_ROOT && !filePath.startsWith(`${OFFLINE_ROOT}${sep}`)) {
+  const root = isIndex ? HTML_ROOT : OFFLINE_ROOT;
+  const filePath = resolve(join(root, ...segments));
+  if (filePath !== root && !filePath.startsWith(`${root}${sep}`)) {
     return new Response("Not found", { status: 404 });
   }
 
