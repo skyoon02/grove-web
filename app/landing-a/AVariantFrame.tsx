@@ -35,10 +35,12 @@ function isContactBridgeMessage(value: unknown): value is ContactBridgeMessage {
 export default function AVariantFrame() {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [showIntro, setShowIntro] = useState(true);
-  const [iframeSrc, setIframeSrc] = useState<string | undefined>(undefined);
+  const [iframeSrc] = useState("/landing-a/source/");
   const [headerLight, setHeaderLight] = useState(true);
   const [headerVisible, setHeaderVisible] = useState(true);
   const [contactOpen, setContactOpen] = useState(false);
+  const exitStartedRef = useRef(false);
+  const frameLoadedRef = useRef(false);
 
   // intro 노출 중 body scroll 잠금
   useEffect(() => {
@@ -82,11 +84,13 @@ export default function AVariantFrame() {
   };
 
   const startHeroReveal = () => {
-    setIframeSrc("/landing-a/source/");
+    exitStartedRef.current = true;
+    if (frameLoadedRef.current) postHeroReveal();
   };
 
   const handleFrameLoad = () => {
-    postHeroReveal();
+    frameLoadedRef.current = true;
+    if (exitStartedRef.current) postHeroReveal();
   };
 
   return (

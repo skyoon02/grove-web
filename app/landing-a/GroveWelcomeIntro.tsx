@@ -128,7 +128,7 @@ type GroveWelcomeIntroProps = {
 };
 
 const EXIT_DURATION_MS = 1120;
-const PRELOAD_LEAD_MS = 600; // exit 600ms 전에 iframe 미리 로드 (localhost는 즉시 로드)
+const PRELOAD_LEAD_MS = 0;
 
 const GroveWelcomeIntro = ({
   onExitStart,
